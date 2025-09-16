@@ -1,0 +1,70 @@
+{
+  "name": "TransitTracker - Real-Time Public Transport Tracking",
+  "short_name": "TransitTracker",
+  "description": "Real-time public transport tracking for small cities with GTFS-Realtime feeds, accessibility features, and offline support",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2E7D32",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["transportation", "travel", "utilities"],
+  "icons": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMjQiIGZpbGw9IiMyRTdEMzIiLz4KPHBhdGggZD0iTTQ4IDY0SDE0NFYxMjhINDRWNjRaIiBmaWxsPSJ3aGl0ZSIvPgo8Y2lyY2xlIGN4PSI2NCIgY3k9IjEwNCIgcj0iMTYiIGZpbGw9IiMyRTdEMzIiLz4KPGNpcmNsZSBjeD0iMTI4IiBjeT0iMTA0IiByPSIxNiIgZmlsbD0iIzJFN0QzMiIvPgo8cGF0aCBkPSJNNTYgODhIMTM2Vjk2SDU2Vjg4WiIgZmlsbD0iIzJFN0QzMiIvPgo8L3N2Zz4K",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iNjQiIGZpbGw9IiMyRTdEMzIiLz4KPHBhdGggZD0iTTEyOCAxNzBIMzg0VjM0MkgxMjhWMTcwWiIgZmlsbD0id2hpdGUiLz4KPGNpcmNsZSBjeD0iMTcwIiBjeT0iMjc2IiByPSI0MiIgZmlsbD0iIzJFN0QzMiIvPgo8Y2lyY2xlIGN4PSIzNDIiIGN5PSIyNzYiIHI9IjQyIiBmaWxsPSIjMkU3RDMyIi8+CjxwYXRoIGQ9Ik0xNDkgMjM0SDM2M1YyNDZIMTQ5VjIzNFoiIGZpbGw9IiMyRTdEMzIiLz4KPC9zdmc+Cg==",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4MCIgaGVpZ2h0PSI3MjAiIHZpZXdCb3g9IjAgMCAxMjgwIDcyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjEyODAiIGhlaWdodD0iNzIwIiBmaWxsPSIjRjVGNUY1Ii8+CjxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjMkU3RDMyIi8+Cjx0ZXh0IHg9IjY0IiB5PSI0OCIgZm9udC1mYW1pbHk9IkludGVyLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjI0IiBmb250LXdlaWdodD0iNjAwIiBmaWxsPSJ3aGl0ZSI+VHJhbnNpdFRyYWNrZXI8L3RleHQ+CjxyZWN0IHg9IjY0IiB5PSIxMjAiIHdpZHRoPSIxMTUyIiBoZWlnaHQ9IjQ4MCIgcng9IjI0IiBmaWxsPSJ3aGl0ZSIgc3Ryb2tlPSIjRTVFN0VCIiBzdHJva2Utd2lkdGg9IjIiLz4KPHN2ZyB4PSI2NCIgeT0iMTIwIiB3aWR0aD0iMTE1MiIgaGVpZ2h0PSI0ODAiPgo8cmVjdCB3aWR0aD0iMTE1MiIgaGVpZ2h0PSI0ODAiIGZpbGw9IiNGOUZBRkMiLz4KPHN2ZyB4PSI1NzYiIHk9IjI0MCIgd2lkdGg9IjEyOCIgaGVpZ2h0PSI4MCI+CjxjaXJjbGUgY3g9IjY0IiBjeT0iNDAiIHI9IjQwIiBmaWxsPSIjMkU3RDMyIi8+Cjx0ZXh0IHg9IjY0IiB5PSI0OCIgZm9udC1mYW1pbHk9IkludGVyLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjI0IiBmb250LXdlaWdodD0iNjAwIiBmaWxsPSJ3aGl0ZSI+4p2M8L3RleHQ+Cjwvc3ZnPgo8dGV4dCB4PSI2NCIgeT0iMTYwIiBmb250LWZhbWlseT0iSW50ZXIsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iNDgiIGZvbnQtd2VpZ2h0PSI3MDAiIGZpbGw9IiMzMzMiPlJlYWwtVGltZSBQdWJsaWMgVHJhbnNwb3J0IFRyYWNraW5nPC90ZXh0Pgo8dGV4dCB4PSI2NCIgeT0iMjIwIiBmb250LWZhbWlseT0iSW50ZXIsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiM2NjYiPk1ha2luZyB0cmFuc3BvcnQgcmVsaWFibGUsIGFjY2Vzc2libGUsIGFuZCBzdXN0YWluYWJsZSBpbiB0aWVyLTIgY2l0aWVzLjwvdGV4dD4KPC9zdmc+Cjwvc3ZnPgo=",
+      "sizes": "1280x720",
+      "type": "image/svg+xml",
+      "form_factor": "wide",
+      "label": "TransitTracker Home Screen"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Live Tracking",
+      "short_name": "Tracking",
+      "description": "View live bus tracking",
+      "url": "/#live-tracking",
+      "icons": [
+        {
+          "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOTYiIGhlaWdodD0iOTYiIHZpZXdCb3g9IjAgMCA5NiA5NiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iNDgiIGN5PSI0OCIgcj0iNDgiIGZpbGw9IiMyRTdEMzIiLz4KPHBhdGggZD0iTTI0IDQ4SDcyTTQ4IDI0VjcyIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4K",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Route Planning",
+      "short_name": "Plan",
+      "description": "Plan your journey",
+      "url": "/#route-planning",
+      "icons": [
+        {
+          "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOTYiIGhlaWdodD0iOTYiIHZpZXdCb3g9IjAgMCA5NiA5NiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iNDgiIGN5PSI0OCIgcj0iNDgiIGZpbGw9IiMxOTc2RDIiLz4KPHBhdGggZD0iTTI4IDQ4TDM2IDU2TDY4IDI0IiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8L3N2Zz4K",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  }
+}

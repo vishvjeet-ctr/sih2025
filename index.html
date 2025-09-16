@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Public Transport Tracking for Small Cities</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="description" content="Real-time public transport tracking for small cities with GTFS-Realtime feeds, accessibility features, and offline support">
+    <meta name="theme-color" content="#2E7D32">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <!-- Accessibility Controls -->
+    <div class="accessibility-controls" id="accessibilityControls">
+        <button class="accessibility-btn" onclick="toggleHighContrast()" title="Toggle High Contrast Mode">
+            <i class="fas fa-adjust"></i>
+        </button>
+        <button class="accessibility-btn" onclick="toggleLanguage()" title="Change Language">
+            <i class="fas fa-language"></i>
+        </button>
+        <button class="accessibility-btn" onclick="toggleFontSize()" title="Increase Font Size">
+            <i class="fas fa-text-height"></i>
+        </button>
+        <button class="accessibility-btn" onclick="toggleScreenReader()" title="Screen Reader Mode">
+            <i class="fas fa-universal-access"></i>
+        </button>
+    </div>
+
+    <!-- Language Selector -->
+    <div class="language-selector" id="languageSelector" style="display: none;">
+        <button class="lang-btn active" data-lang="en">English</button>
+        <button class="lang-btn" data-lang="hi">हिन्दी</button>
+        <button class="lang-btn" data-lang="pa">ਪੰਜਾਬੀ</button>
+        <button class="lang-btn" data-lang="ur">اردو</button>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-bus" aria-hidden="true"></i>
+                <span>TransitTracker</span>
+            </div>
+            <ul class="nav-menu" id="nav-menu" role="menubar">
+                <li class="nav-item" role="none">
+                    <a href="#home" class="nav-link" role="menuitem" data-en="Home" data-hi="होम" data-pa="ਘਰ" data-ur="ہوم">Home</a>
+                </li>
+                <li class="nav-item" role="none">
+                    <a href="#problem" class="nav-link" role="menuitem" data-en="Problem" data-hi="समस्या" data-pa="ਸਮੱਸਿਆ" data-ur="مسئلہ">Problem</a>
+                </li>
+                <li class="nav-item" role="none">
+                    <a href="#impact" class="nav-link" role="menuitem" data-en="Impact" data-hi="प्रभाव" data-pa="ਪ੍ਰਭਾਵ" data-ur="اثر">Impact</a>
+                </li>
+                <li class="nav-item" role="none">
+                    <a href="#outcomes" class="nav-link" role="menuitem" data-en="Outcomes" data-hi="परिणाम" data-pa="ਨਤੀਜੇ" data-ur="نتائج">Outcomes</a>
+                </li>
+                <li class="nav-item" role="none">
+                    <a href="#stakeholders" class="nav-link" role="menuitem" data-en="Stakeholders" data-hi="हितधारक" data-pa="ਹਿੱਤਧਾਰਕ" data-ur="اسٹیک ہولڈرز">Stakeholders</a>
+                </li>
+                <li class="nav-item" role="none">
+                    <a href="#data" class="nav-link" role="menuitem" data-en="Data" data-hi="डेटा" data-pa="ਡੇਟਾ" data-ur="ڈیٹا">Data</a>
+                </li>
+                <li class="nav-item" role="none">
+                    <a href="#contact" class="nav-link" role="menuitem" data-en="Contact" data-hi="संपर्क" data-pa="ਸੰਪਰਕ" data-ur="رابطہ">Contact</a>
+                </li>
+            </ul>
+            <div class="hamburger" id="hamburger" role="button" aria-label="Toggle navigation menu" tabindex="0">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Home Section -->
+    <section id="home" class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1 class="hero-title">Real-Time Public Transport Tracking for Small Cities</h1>
+                <p class="hero-tagline">Making transport reliable, accessible, and sustainable in tier-2 cities.</p>
+                <button class="cta-button" onclick="scrollToSection('problem')">
+                    Learn More
+                    <i class="fas fa-arrow-down"></i>
+                </button>
+            </div>
+            <div class="hero-visual">
+                <div class="bus-animation">
+                    <i class="fas fa-bus bus-icon"></i>
+                    <div class="route-line"></div>
+                    <div class="gps-dots">
+                        <div class="gps-dot"></div>
+                        <div class="gps-dot"></div>
+                        <div class="gps-dot"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Smart Search Bar -->
+    <section class="smart-search">
+        <div class="search-container">
+            <div class="search-box">
+                <i class="fas fa-search search-icon" aria-hidden="true"></i>
+                <input type="text" id="searchInput" placeholder="Search by bus route, station name, or destination..." aria-label="Search for bus routes and stops">
+                <button class="search-btn" onclick="performSearch()" aria-label="Search">
+                    <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                </button>
+            </div>
+            <div class="search-suggestions" id="searchSuggestions" role="listbox" aria-label="Search suggestions"></div>
+        </div>
+    </section>
+
+    <!-- GTFS-Realtime Live Tracking Section -->
+    <section class="live-tracking-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 data-en="Live Bus Tracking" data-hi="लाइव बस ट्रैकिंग" data-pa="ਲਾਈਵ ਬਸ ਟ੍ਰੈਕਿੰਗ" data-ur="لائیو بس ٹریکنگ">Live Bus Tracking</h2>
+                <p class="section-subtitle" data-en="Real-time GTFS-Realtime feeds showing live bus positions and arrival predictions" data-hi="वास्तविक समय में बस की स्थिति और आगमन की भविष्यवाणी दिखाने वाले जीटीएफएस-रियलटाइम फीड" data-pa="ਰੀਅਲ-ਟਾਈਮ ਵਿੱਚ ਬਸ ਦੀ ਸਥਿਤੀ ਅਤੇ ਆਗਮਨ ਦੀ ਭਵਿੱਖਬਾਣੀ ਦਿਖਾਉਣ ਵਾਲੇ GTFS-ਰੀਅਲਟਾਈਮ ਫੀਡ" data-ur="ریئل ٹائم میں بس کی پوزیشن اور آمد کی پیشن گوئی دکھانے والے GTFS-ریئل ٹائم فیڈ">Real-time GTFS-Realtime feeds showing live bus positions and arrival predictions</p>
+            </div>
+            
+            <div class="tracking-dashboard">
+                <div class="tracking-controls">
+                    <button class="tracking-btn active" onclick="showMapView()" data-en="Map View" data-hi="मानचित्र दृश्य" data-pa="ਨਕਸ਼ਾ ਦ੍ਰਿਸ਼" data-ur="نقشہ ویو">
+                        <i class="fas fa-map" aria-hidden="true"></i>
+                        Map View
+                    </button>
+                    <button class="tracking-btn" onclick="showListView()" data-en="List View" data-hi="सूची दृश्य" data-pa="ਲਿਸਟ ਦ੍ਰਿਸ਼" data-ur="لسٹ ویو">
+                        <i class="fas fa-list" aria-hidden="true"></i>
+                        List View
+                    </button>
+                    <button class="tracking-btn" onclick="toggleAlerts()" data-en="Alerts" data-hi="अलर्ट" data-pa="ਅਲਰਟ" data-ur="الرٹس">
+                        <i class="fas fa-bell" aria-hidden="true"></i>
+                        Alerts
+                        <span class="alert-badge" id="alertBadge">3</span>
+                    </button>
+                </div>
+
+                <div class="tracking-content">
+                    <!-- Map View -->
+                    <div class="map-view" id="mapView">
+                        <div class="map-container">
+                            <div class="map-placeholder">
+                                <i class="fas fa-map-marked-alt" aria-hidden="true"></i>
+                                <h3 data-en="Live Bus Map" data-hi="लाइव बस मानचित्र" data-pa="ਲਾਈਵ ਬਸ ਨਕਸ਼ਾ" data-ur="لائیو بس کا نقشہ">Live Bus Map</h3>
+                                <p data-en="Real-time bus positions with GPS tracking" data-hi="जीपीएस ट्रैकिंग के साथ वास्तविक समय में बस की स्थिति" data-pa="GPS ਟ੍ਰੈਕਿੰਗ ਦੇ ਨਾਲ ਰੀਅਲ-ਟਾਈਮ ਬਸ ਪੋਜੀਸ਼ਨ" data-ur="GPS ٹریکنگ کے ساتھ ریئل ٹائم بس پوزیشن">Real-time bus positions with GPS tracking</p>
+                            </div>
+                            <div class="live-buses" id="liveBuses">
+                                <!-- Live bus markers will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- List View -->
+                    <div class="list-view" id="listView" style="display: none;">
+                        <div class="bus-list" id="busList">
+                            <!-- Bus arrival predictions will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Alerts Panel -->
+                    <div class="alerts-panel" id="alertsPanel" style="display: none;">
+                        <div class="alerts-list" id="alertsList">
+                            <!-- Service alerts will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Journey Progress Section -->
+    <section class="journey-progress-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 data-en="My Journey" data-hi="मेरी यात्रा" data-pa="ਮੇਰੀ ਯਾਤਰਾ" data-ur="میری سفر">My Journey</h2>
+                <p class="section-subtitle" data-en="Track your current journey with real-time updates" data-hi="वास्तविक समय के अपडेट के साथ अपनी वर्तमान यात्रा को ट्रैक करें" data-pa="ਰੀਅਲ-ਟਾਈਮ ਅਪਡੇਟਾਂ ਦੇ ਨਾਲ ਆਪਣੀ ਮੌਜੂਦਾ ਯਾਤਰਾ ਨੂੰ ਟ੍ਰੈਕ ਕਰੋ" data-ur="ریئل ٹائم اپڈیٹس کے ساتھ اپنی موجودہ سفر کو ٹریک کریں">Track your current journey with real-time updates</p>
+            </div>
+            
+            <div class="journey-tracker" id="journeyTracker">
+                <div class="journey-card">
+                    <div class="journey-header">
+                        <h3 data-en="Route 42A: City Center → Airport" data-hi="रूट 42A: सिटी सेंटर → एयरपोर्ट" data-pa="ਰੂਟ 42A: ਸਿਟੀ ਸੈਂਟਰ → ਏਅਰਪੋਰਟ" data-ur="روٹ 42A: سٹی سینٹر → ایئرپورٹ">Route 42A: City Center → Airport</h3>
+                        <div class="journey-status">
+                            <span class="status-indicator on-time" data-en="On Time" data-hi="समय पर" data-pa="ਸਮੇਂ 'ਤੇ" data-ur="وقت پر">On Time</span>
+                        </div>
+                    </div>
+                    
+                    <div class="journey-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 65%"></div>
+                        </div>
+                        <div class="progress-stops">
+                            <div class="stop completed">
+                                <i class="fas fa-check-circle" aria-hidden="true"></i>
+                                <span data-en="Central Station" data-hi="केंद्रीय स्टेशन" data-pa="ਕੇਂਦਰੀ ਸਟੇਸ਼ਨ" data-ur="سنٹرل اسٹیشن">Central Station</span>
+                            </div>
+                            <div class="stop completed">
+                                <i class="fas fa-check-circle" aria-hidden="true"></i>
+                                <span data-en="Mall Road" data-hi="मॉल रोड" data-pa="ਮਾਲ ਰੋਡ" data-ur="مال روڈ">Mall Road</span>
+                            </div>
+                            <div class="stop current">
+                                <i class="fas fa-bus" aria-hidden="true"></i>
+                                <span data-en="University" data-hi="विश्वविद्यालय" data-pa="ਯੂਨੀਵਰਸਿਟੀ" data-ur="یونیورسٹی">University</span>
+                            </div>
+                            <div class="stop upcoming">
+                                <i class="fas fa-circle" aria-hidden="true"></i>
+                                <span data-en="Airport Terminal" data-hi="एयरपोर्ट टर्मिनल" data-pa="ਏਅਰਪੋਰਟ ਟਰਮੀਨਲ" data-ur="ایئرپورٹ ٹرمینل">Airport Terminal</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="journey-info">
+                        <div class="info-item">
+                            <i class="fas fa-clock" aria-hidden="true"></i>
+                            <span data-en="ETA: 8 minutes" data-hi="अनुमानित समय: 8 मिनट" data-pa="ਅਨੁਮਾਨਿਤ ਸਮਾਂ: 8 ਮਿੰਟ" data-ur="متوقع وقت: 8 منٹ">ETA: 8 minutes</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                            <span data-en="2 stops remaining" data-hi="2 स्टॉप बाकी" data-pa="2 ਸਟਾਪ ਬਾਕੀ" data-ur="2 اسٹاپ باقی">2 stops remaining</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-bell" aria-hidden="true"></i>
+                            <button class="alert-btn" onclick="setArrivalAlert()" data-en="Set Arrival Alert" data-hi="आगमन अलर्ट सेट करें" data-pa="ਆਗਮਨ ਅਲਰਟ ਸੈੱਟ ਕਰੋ" data-ur="آمد کا الارم سیٹ کریں">Set Arrival Alert</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Problem Statement Section -->
+    <section id="problem" class="problem-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>The Problem</h2>
+                <p class="section-subtitle">Understanding the challenges in small city transportation</p>
+            </div>
+            <div class="problem-content">
+                <div class="problem-text">
+                    <div class="problem-item">
+                        <i class="fas fa-clock"></i>
+                        <h3>Unpredictable Schedules</h3>
+                        <p>Buses arrive without warning, leaving commuters waiting indefinitely at stops with no real-time information.</p>
+                    </div>
+                    <div class="problem-item">
+                        <i class="fas fa-users"></i>
+                        <h3>Overcrowding Issues</h3>
+                        <p>Peak hours see buses packed beyond capacity, while off-peak times have empty buses running inefficiently.</p>
+                    </div>
+                    <div class="problem-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <h3>No Real-Time Tracking</h3>
+                        <p>Commuters have no way to know where their bus is, when it will arrive, or if it's running on schedule.</p>
+                    </div>
+                    <div class="problem-item">
+                        <i class="fas fa-car"></i>
+                        <h3>Increased Private Vehicle Use</h3>
+                        <p>Unreliable public transport forces people to use private vehicles, increasing traffic and pollution.</p>
+                    </div>
+                </div>
+                <div class="problem-visual">
+                    <div class="bus-illustration">
+                        <i class="fas fa-bus"></i>
+                        <div class="gps-signal">
+                            <div class="signal-wave"></div>
+                            <div class="signal-wave"></div>
+                            <div class="signal-wave"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Impact Section -->
+    <section id="impact" class="impact-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Current Impact</h2>
+                <p class="section-subtitle">The real cost of inefficient public transport</p>
+            </div>
+            <div class="impact-grid">
+                <div class="impact-card">
+                    <div class="impact-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="impact-number">60%+</div>
+                    <div class="impact-text">of commuters face delays without real-time information</div>
+                </div>
+                <div class="impact-card">
+                    <div class="impact-icon">
+                        <i class="fas fa-car-side"></i>
+                    </div>
+                    <div class="impact-number">40%</div>
+                    <div class="impact-text">increase in private vehicle dependency due to unreliable transport</div>
+                </div>
+                <div class="impact-card">
+                    <div class="impact-icon">
+                        <i class="fas fa-smog"></i>
+                    </div>
+                    <div class="impact-number">25%</div>
+                    <div class="impact-text">more traffic congestion and air pollution in small cities</div>
+                </div>
+                <div class="impact-card">
+                    <div class="impact-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="impact-number">45 min</div>
+                    <div class="impact-text">average daily time wasted waiting for unpredictable buses</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Expected Outcomes Section -->
+    <section id="outcomes" class="outcomes-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Expected Outcomes</h2>
+                <p class="section-subtitle">Transforming public transport with smart technology</p>
+            </div>
+            <div class="outcomes-grid">
+                <div class="outcome-card">
+                    <div class="outcome-icon">
+                        <i class="fas fa-satellite-dish"></i>
+                    </div>
+                    <h3>GPS-Based Real-Time Tracking</h3>
+                    <p>Live location updates showing exactly where buses are on their routes with accurate positioning.</p>
+                </div>
+                <div class="outcome-card">
+                    <div class="outcome-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3>Estimated Arrival Times</h3>
+                    <p>Smart algorithms predict arrival times based on traffic, weather, and historical data patterns.</p>
+                </div>
+                <div class="outcome-card">
+                    <div class="outcome-icon">
+                        <i class="fas fa-route"></i>
+                    </div>
+                    <h3>Complete Route Information</h3>
+                    <p>Detailed route maps, stops, and alternative routes to help commuters plan their journeys.</p>
+                </div>
+                <div class="outcome-card">
+                    <div class="outcome-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Low Bandwidth Optimization</h3>
+                    <p>Efficient data usage with offline mode capabilities for areas with poor connectivity.</p>
+                </div>
+                <div class="outcome-card">
+                    <div class="outcome-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <h3>Smart Notifications</h3>
+                    <p>Customizable alerts for bus arrivals, delays, and route changes sent directly to your device.</p>
+                </div>
+                <div class="outcome-card">
+                    <div class="outcome-icon">
+                        <i class="fas fa-battery-three-quarters"></i>
+                    </div>
+                    <h3>Battery Efficient</h3>
+                    <p>Minimal battery usage with smart background processing and optimized location services.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Enhanced Search & Route Planning Section -->
+    <section class="make-transport-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 data-en="Smart Route Planning" data-hi="स्मार्ट रूट प्लानिंग" data-pa="ਸਮਾਰਟ ਰੂਟ ਪਲੈਨਿੰਗ" data-ur="اسمارٹ روٹ پلاننگ">Smart Route Planning</h2>
+                <p class="section-subtitle" data-en="Multi-modal journey planning with real-time alternatives" data-hi="वास्तविक समय के विकल्पों के साथ बहु-मोडल यात्रा योजना" data-pa="ਰੀਅਲ-ਟਾਈਮ ਵਿਕਲਪਾਂ ਦੇ ਨਾਲ ਮਲਟੀ-ਮੋਡਲ ਯਾਤਰਾ ਯੋਜਨਾ" data-ur="ریئل ٹائم متبادلات کے ساتھ ملٹی موڈل سفر کی منصوبہ بندی">Multi-modal journey planning with real-time alternatives</p>
+            </div>
+            
+            <div class="transport-planner">
+                <div class="planner-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="source" data-en="From" data-hi="से" data-pa="ਤੋਂ" data-ur="سے">From</label>
+                            <input type="text" id="source" placeholder="Enter starting point" aria-label="Starting location">
+                            <button class="location-btn" onclick="getCurrentLocation('source')" title="Use current location">
+                                <i class="fas fa-crosshairs" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <div class="form-group">
+                            <label for="destination" data-en="To" data-hi="तक" data-pa="ਤੱਕ" data-ur="تک">To</label>
+                            <input type="text" id="destination" placeholder="Enter destination" aria-label="Destination">
+                            <button class="location-btn" onclick="getCurrentLocation('destination')" title="Use current location">
+                                <i class="fas fa-crosshairs" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="departure-time" data-en="Departure Time" data-hi="प्रस्थान समय" data-pa="ਰਵਾਨਗੀ ਦਾ ਸਮਾਂ" data-ur="روانگی کا وقت">Departure Time</label>
+                            <input type="time" id="departure-time" aria-label="Departure time">
+                        </div>
+                        <div class="form-group">
+                            <label for="arrival-time" data-en="Arrival Time" data-hi="आगमन समय" data-pa="ਆਗਮਨ ਦਾ ਸਮਾਂ" data-ur="آمد کا وقت">Arrival Time</label>
+                            <input type="time" id="arrival-time" aria-label="Arrival time">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label data-en="Transport Preferences" data-hi="परिवहन प्राथमिकताएं" data-pa="ਪਰਿਵਹਨ ਤਰਜੀਹਾਂ" data-ur="ٹرانسپورٹ ترجیحات">Transport Preferences</label>
+                        <div class="preference-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="preferBus" checked>
+                                <span data-en="Bus" data-hi="बस" data-pa="ਬਸ" data-ur="بس">Bus</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="preferWalk">
+                                <span data-en="Walking" data-hi="पैदल चलना" data-pa="ਪੈਦਲ" data-ur="چلنا">Walking</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="preferMetro">
+                                <span data-en="Metro" data-hi="मेट्रो" data-pa="ਮੈਟਰੋ" data-ur="میٹرو">Metro</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <button class="plan-btn" onclick="planTransport()" data-en="Plan My Journey" data-hi="मेरी यात्रा की योजना बनाएं" data-pa="ਮੇਰੀ ਯਾਤਰਾ ਦੀ ਯੋਜਨਾ ਬਣਾਓ" data-ur="میری سفر کی منصوبہ بندی کریں">
+                        <i class="fas fa-route" aria-hidden="true"></i>
+                        Plan My Journey
+                    </button>
+                </div>
+                
+                <div class="planner-results" id="plannerResults">
+                    <!-- Results will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Favorites & Quick Access Section -->
+    <section class="favorites-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 data-en="My Favorites" data-hi="मेरे पसंदीदा" data-pa="ਮੇਰੇ ਪਸੰਦੀਦਾ" data-ur="میرے پسندیدہ">My Favorites</h2>
+                <p class="section-subtitle" data-en="Quick access to your frequently used routes and stops" data-hi="आपके अक्सर उपयोग किए जाने वाले रूट और स्टॉप तक त्वरित पहुंच" data-pa="ਤੁਹਾਡੇ ਅਕਸਰ ਵਰਤੇ ਜਾਣ ਵਾਲੇ ਰੂਟਾਂ ਅਤੇ ਸਟਾਪਾਂ ਤੱਕ ਤੇਜ਼ ਪਹੁੰਚ" data-ur="آپ کے اکثر استعمال ہونے والے راستوں اور اسٹاپس تک تیز رسائی">Quick access to your frequently used routes and stops</p>
+            </div>
+            
+            <div class="favorites-grid">
+                <div class="favorites-category">
+                    <h3 data-en="Favorite Routes" data-hi="पसंदीदा रूट" data-pa="ਪਸੰਦੀਦਾ ਰੂਟ" data-ur="پسندیدہ راستے">Favorite Routes</h3>
+                    <div class="favorite-items" id="favoriteRoutes">
+                        <div class="favorite-item">
+                            <i class="fas fa-bus" aria-hidden="true"></i>
+                            <div class="favorite-info">
+                                <span class="favorite-name">Route 42A</span>
+                                <span class="favorite-desc">City Center → Airport</span>
+                            </div>
+                            <button class="favorite-btn" onclick="removeFavorite('route', '42A')" title="Remove from favorites">
+                                <i class="fas fa-heart" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <div class="favorite-item">
+                            <i class="fas fa-bus" aria-hidden="true"></i>
+                            <div class="favorite-info">
+                                <span class="favorite-name">Route 15B</span>
+                                <span class="favorite-desc">Railway → Hospital</span>
+                            </div>
+                            <button class="favorite-btn" onclick="removeFavorite('route', '15B')" title="Remove from favorites">
+                                <i class="fas fa-heart" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="favorites-category">
+                    <h3 data-en="Favorite Stops" data-hi="पसंदीदा स्टॉप" data-pa="ਪਸੰਦੀਦਾ ਸਟਾਪ" data-ur="پسندیدہ اسٹاپس">Favorite Stops</h3>
+                    <div class="favorite-items" id="favoriteStops">
+                        <div class="favorite-item">
+                            <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                            <div class="favorite-info">
+                                <span class="favorite-name">Central Station</span>
+                                <span class="favorite-desc">Next bus: 5 min</span>
+                            </div>
+                            <button class="favorite-btn" onclick="removeFavorite('stop', 'Central Station')" title="Remove from favorites">
+                                <i class="fas fa-heart" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <div class="favorite-item">
+                            <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                            <div class="favorite-info">
+                                <span class="favorite-name">University</span>
+                                <span class="favorite-desc">Next bus: 12 min</span>
+                            </div>
+                            <button class="favorite-btn" onclick="removeFavorite('stop', 'University')" title="Remove from favorites">
+                                <i class="fas fa-heart" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stakeholders Section -->
+    <section id="stakeholders" class="stakeholders-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Key Stakeholders</h2>
+                <p class="section-subtitle">Who benefits from this solution</p>
+            </div>
+            <div class="stakeholders-grid">
+                <div class="stakeholder-card">
+                    <div class="stakeholder-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Commuters</h3>
+                    <p>Daily passengers who rely on public transport for work, education, and daily activities. They benefit from reliable schedules, real-time updates, and reduced waiting times.</p>
+                </div>
+                <div class="stakeholder-card">
+                    <div class="stakeholder-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <h3>Local Transport Authorities</h3>
+                    <p>Municipal transport departments and bus operators who can optimize routes, reduce operational costs, and improve service quality with data-driven insights.</p>
+                </div>
+                <div class="stakeholder-card">
+                    <div class="stakeholder-icon">
+                        <i class="fas fa-landmark"></i>
+                    </div>
+                    <h3>Municipal Corporations</h3>
+                    <p>City governments that can reduce traffic congestion, improve air quality, and enhance urban mobility through better public transport systems.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Supporting Data & References Section -->
+    <section id="data" class="data-section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Supporting Data & References</h2>
+                <p class="section-subtitle">Research and industry insights</p>
+            </div>
+            <div class="data-content">
+                <div class="data-quote">
+                    <blockquote>
+                        "Urban mobility inefficiencies in tier-2 cities result in significant economic losses and environmental impact. Real-time tracking systems can reduce waiting times by up to 40% and increase public transport ridership by 25%."
+                    </blockquote>
+                    <cite>— Urban Mobility India Report 2024</cite>
+                </div>
+                <div class="references-grid">
+                    <div class="reference-card">
+                        <h4>Uber's Make My Train</h4>
+                        <p>Revolutionary feature allowing users to see station schedules in real-time and choose the train they want to catch. Users can pick how much time before departure to arrive at the station, with smart scheduling for pickups.</p>
+                        <div class="reference-links">
+                            <a href="#" class="ref-link">Uber Official</a>
+                            <a href="#" class="ref-link">Smart Cities Dive</a>
+                        </div>
+                    </div>
+                    <div class="reference-card">
+                        <h4>Where Is My Train</h4>
+                        <p>Features include smart search by route or name (tolerant to typos), offline schedule access, arrival alerts, and minimal data/battery usage. Successfully serves millions of commuters across India.</p>
+                        <div class="reference-links">
+                            <a href="#" class="ref-link">Google Play</a>
+                            <a href="#" class="ref-link">Wikipedia</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Privacy & Security Section -->
+    <section class="privacy-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 data-en="Privacy & Security" data-hi="गोपनीयता और सुरक्षा" data-pa="ਗੁਪਤਤਾ ਅਤੇ ਸੁਰੱਖਿਆ" data-ur="پرائیویسی اور سیکیورٹی">Privacy & Security</h2>
+                <p class="section-subtitle" data-en="Your data privacy and security are our top priorities" data-hi="आपकी डेटा गोपनीयता और सुरक्षा हमारी सर्वोच्च प्राथमिकता है" data-pa="ਤੁਹਾਡੀ ਡੇਟਾ ਗੁਪਤਤਾ ਅਤੇ ਸੁਰੱਖਿਆ ਸਾਡੀ ਸਭ ਤੋਂ ਵੱਡੀ ਪ੍ਰਾਥਮਿਕਤਾ ਹੈ" data-ur="آپ کی ڈیٹا پرائیویسی اور سیکیورٹی ہماری سب سے بڑی ترجیح ہے">Your data privacy and security are our top priorities</p>
+            </div>
+            
+            <div class="privacy-content">
+                <div class="privacy-card">
+                    <div class="privacy-icon">
+                        <i class="fas fa-shield-alt" aria-hidden="true"></i>
+                    </div>
+                    <h3 data-en="Data Collection" data-hi="डेटा संग्रह" data-pa="ਡੇਟਾ ਸੰਗ੍ਰਹਿ" data-ur="ڈیٹا کالیکشن">Data Collection</h3>
+                    <p data-en="We only collect location data when you explicitly opt-in for real-time tracking. All data is anonymized and used solely for improving transport services." data-hi="हम केवल तभी स्थान डेटा एकत्र करते हैं जब आप वास्तविक समय ट्रैकिंग के लिए स्पष्ट रूप से ऑप्ट-इन करते हैं। सभी डेटा गुमनाम है और केवल परिवहन सेवाओं में सुधार के लिए उपयोग किया जाता है।" data-pa="ਅਸੀਂ ਸਿਰਫ਼ ਉਦੋਂ ਲੋਕੇਸ਼ਨ ਡੇਟਾ ਇਕੱਠਾ ਕਰਦੇ ਹਾਂ ਜਦੋਂ ਤੁਸੀਂ ਰੀਅਲ-ਟਾਈਮ ਟ੍ਰੈਕਿੰਗ ਲਈ ਸਪਸ਼ਟ ਤੌਰ 'ਤੇ ਆਪਟ-ਇਨ ਕਰਦੇ ਹੋ। ਸਾਰਾ ਡੇਟਾ ਅਗਿਆਤ ਹੈ ਅਤੇ ਸਿਰਫ਼ ਟ੍ਰਾਂਸਪੋਰਟ ਸੇਵਾਵਾਂ ਵਿੱਚ ਸੁਧਾਰ ਲਈ ਵਰਤਿਆ ਜਾਂਦਾ ਹੈ।" data-ur="ہم صرف اس وقت لوکیشن ڈیٹا جمع کرتے ہیں جب آپ ریئل ٹائم ٹریکنگ کے لیے واضح طور پر آپٹ ان کرتے ہیں۔ تمام ڈیٹا گمنام ہے اور صرف ٹرانسپورٹ سروسز کو بہتر بنانے کے لیے استعمال ہوتا ہے۔">We only collect location data when you explicitly opt-in for real-time tracking. All data is anonymized and used solely for improving transport services.</p>
+                </div>
+                
+                <div class="privacy-card">
+                    <div class="privacy-icon">
+                        <i class="fas fa-lock" aria-hidden="true"></i>
+                    </div>
+                    <h3 data-en="Data Security" data-hi="डेटा सुरक्षा" data-pa="ਡੇਟਾ ਸੁਰੱਖਿਆ" data-ur="ڈیٹا سیکیورٹی">Data Security</h3>
+                    <p data-en="All data transmission is encrypted using industry-standard SSL/TLS protocols. We never share your personal information with third parties without your explicit consent." data-hi="सभी डेटा ट्रांसमिशन उद्योग-मानक SSL/TLS प्रोटोकॉल का उपयोग करके एन्क्रिप्टेड है। हम आपकी स्पष्ट सहमति के बिना कभी भी आपकी व्यक्तिगत जानकारी तीसरे पक्ष के साथ साझा नहीं करते।" data-pa="ਸਾਰਾ ਡੇਟਾ ਟ੍ਰਾਂਸਮਿਸ਼ਨ ਇੰਡਸਟਰੀ-ਸਟੈਂਡਰਡ SSL/TLS ਪ੍ਰੋਟੋਕੋਲ ਦੀ ਵਰਤੋਂ ਕਰਕੇ ਐਨਕ੍ਰਿਪਟ ਕੀਤਾ ਗਿਆ ਹੈ। ਅਸੀਂ ਤੁਹਾਡੀ ਸਪਸ਼ਟ ਸਹਿਮਤੀ ਤੋਂ ਬਿਨਾਂ ਤੁਹਾਡੀ ਨਿੱਜੀ ਜਾਣਕਾਰੀ ਤੀਜੇ ਪੱਖਾਂ ਨਾਲ ਕਦੇ ਵੀ ਸਾਂਝੀ ਨਹੀਂ ਕਰਦੇ।" data-ur="تمام ڈیٹا ٹرانسمیشن انڈسٹری سٹینڈرڈ SSL/TLS پروٹوکول استعمال کرکے انکرپٹ کیا گیا ہے۔ ہم آپ کی واضح رضامندی کے بغیر کبھی بھی آپ کی ذاتی معلومات تیسرے فریقوں کے ساتھ شیئر نہیں کرتے۔">All data transmission is encrypted using industry-standard SSL/TLS protocols. We never share your personal information with third parties without your explicit consent.</p>
+                </div>
+                
+                <div class="privacy-card">
+                    <div class="privacy-icon">
+                        <i class="fas fa-user-shield" aria-hidden="true"></i>
+                    </div>
+                    <h3 data-en="Your Rights" data-hi="आपके अधिकार" data-pa="ਤੁਹਾਡੇ ਅਧਿਕਾਰ" data-ur="آپ کے حقوق">Your Rights</h3>
+                    <p data-en="You have the right to access, modify, or delete your data at any time. You can also opt-out of location tracking and data collection through the app settings." data-hi="आपको किसी भी समय अपने डेटा तक पहुंचने, संशोधित करने या हटाने का अधिकार है। आप ऐप सेटिंग्स के माध्यम से स्थान ट्रैकिंग और डेटा संग्रह से बाहर निकल सकते हैं।" data-pa="ਤੁਹਾਡੇ ਕੋਲ ਕਿਸੇ ਵੀ ਸਮੇਂ ਆਪਣੇ ਡੇਟਾ ਤੱਕ ਪਹੁੰਚਣ, ਸੋਧਣ ਜਾਂ ਹਟਾਉਣ ਦਾ ਅਧਿਕਾਰ ਹੈ। ਤੁਸੀਂ ਐਪ ਸੈਟਿੰਗਾਂ ਦੇ ਜ਼ਰੀਏ ਲੋਕੇਸ਼ਨ ਟ੍ਰੈਕਿੰਗ ਅਤੇ ਡੇਟਾ ਸੰਗ੍ਰਹਿ ਤੋਂ ਬਾਹਰ ਨਿਕਲ ਸਕਦੇ ਹੋ।" data-ur="آپ کو کسی بھی وقت اپنے ڈیٹا تک رسائی، ترمیم یا حذف کرنے کا حق ہے۔ آپ ایپ سیٹنگز کے ذریعے لوکیشن ٹریکنگ اور ڈیٹا کالیکشن سے باہر نکل سکتے ہیں۔">You have the right to access, modify, or delete your data at any time. You can also opt-out of location tracking and data collection through the app settings.</p>
+                </div>
+            </div>
+            
+            <div class="privacy-actions">
+                <button class="privacy-btn" onclick="showPrivacySettings()" data-en="Privacy Settings" data-hi="गोपनीयता सेटिंग्स" data-pa="ਗੁਪਤਤਾ ਸੈਟਿੰਗਾਂ" data-ur="پرائیویسی سیٹنگز">Privacy Settings</button>
+                <button class="privacy-btn" onclick="downloadData()" data-en="Download My Data" data-hi="मेरा डेटा डाउनलोड करें" data-pa="ਮੇਰਾ ਡੇਟਾ ਡਾਉਨਲੋਡ ਕਰੋ" data-ur="میرا ڈیٹا ڈاؤن لوڈ کریں">Download My Data</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 data-en="Get In Touch" data-hi="संपर्क करें" data-pa="ਸੰਪਰਕ ਕਰੋ" data-ur="رابطہ کریں">Get In Touch</h2>
+                <p class="section-subtitle" data-en="Let's work together to improve public transport" data-hi="आइए मिलकर सार्वजनिक परिवहन में सुधार करें" data-pa="ਆਓ ਮਿਲਕੇ ਜਨਤਕ ਟ੍ਰਾਂਸਪੋਰਟ ਵਿੱਚ ਸੁਧਾਰ ਕਰੀਏ" data-ur="آئیے مل کر پبلک ٹرانسپورٹ کو بہتر بنائیں">Let's work together to improve public transport</p>
+            </div>
+            <div class="contact-content">
+                <div class="contact-form">
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <label for="name" data-en="Name" data-hi="नाम" data-pa="ਨਾਮ" data-ur="نام">Name</label>
+                            <input type="text" id="name" name="name" required aria-label="Your name">
+                        </div>
+                        <div class="form-group">
+                            <label for="email" data-en="Email" data-hi="ईमेल" data-pa="ਈਮੇਲ" data-ur="ای میل">Email</label>
+                            <input type="email" id="email" name="email" required aria-label="Your email address">
+                        </div>
+                        <div class="form-group">
+                            <label for="message" data-en="Message" data-hi="संदेश" data-pa="ਸੁਨੇਹਾ" data-ur="پیغام">Message</label>
+                            <textarea id="message" name="message" rows="5" required aria-label="Your message"></textarea>
+                        </div>
+                        <button type="submit" class="submit-btn">
+                            <i class="fas fa-paper-plane" aria-hidden="true"></i>
+                            <span data-en="Send Message" data-hi="संदेश भेजें" data-pa="ਸੁਨੇਹਾ ਭੇਜੋ" data-ur="پیغام بھیجیں">Send Message</span>
+                        </button>
+                    </form>
+                </div>
+                <div class="contact-info">
+                    <div class="org-info">
+                        <h3 data-en="Government of Punjab" data-hi="पंजाब सरकार" data-pa="ਪੰਜਾਬ ਸਰਕਾਰ" data-ur="پنجاب حکومت">Government of Punjab</h3>
+                        <p data-en="Department of Higher Education" data-hi="उच्च शिक्षा विभाग" data-pa="ਉੱਚ ਸਿੱਖਿਆ ਵਿਭਾਗ" data-ur="اعلیٰ تعلیم کا محکمہ">Department of Higher Education</p>
+                        <div class="contact-details">
+                            <div class="contact-item">
+                                <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                                <span data-en="Chandigarh, Punjab, India" data-hi="चंडीगढ़, पंजाब, भारत" data-pa="ਚੰਡੀਗੜ੍ਹ, ਪੰਜਾਬ, ਭਾਰਤ" data-ur="چندی گڑھ، پنجاب، بھارت">Chandigarh, Punjab, India</span>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-phone" aria-hidden="true"></i>
+                                <span>+91-172-XXX-XXXX</span>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-envelope" aria-hidden="true"></i>
+                                <span>transport@gov.punjab.in</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <i class="fas fa-bus"></i>
+                    <span>TransitTracker</span>
+                </div>
+                <p>&copy; 2024 Real-Time Public Transport Tracking. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
